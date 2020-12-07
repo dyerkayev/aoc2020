@@ -8,36 +8,33 @@ namespace aoc2020
 {
     class Day7
     {
-        Dictionary<string, List<string>> rules;
+        Dictionary<string, List<(string, int)>> rules;
 
         public Day7()
         {
-            rules = new Dictionary<string, List<string>>();
+            rules = new Dictionary<string, List<(string, int)>>();
             foreach (string line in File.ReadAllLines("day7.txt"))
             {
                 string[] parts = line.Split(" bags contain ");
                 string containerBag = parts[0];
-                List<string> listOfBags = new List<string>();
+                List<(string, int)> listOfBags = new List<(string, int)>();
                 if (!parts[1].StartsWith("no other bags"))
                 {
                     string[] bagStrings = parts[1].Split(", ");
                     foreach(string bagString in bagStrings)
                     {
-                        string[] bagAndAmount = bagString.Split(' ');
-                        int amount = Int32.Parse(bagAndAmount[0]);
+                        string[] bagAndCount = bagString.Split(' ');
+                        int bagCount = Int32.Parse(bagAndCount[0]);
                         string bagName = "";
-                        for(int i = 1; i < bagAndAmount.Length; i++)
+                        for(int i = 1; i < bagAndCount.Length; i++)
                         {
-                            if (bagAndAmount[i].StartsWith("bag"))
+                            if (bagAndCount[i].StartsWith("bag"))
                                 break;
                             if (i > 1) bagName += " ";
-                            bagName += bagAndAmount[i];
+                            bagName += bagAndCount[i];
                         }
 
-                        for (int i = 0; i < amount; i++)
-                        {
-                            listOfBags.Add(bagName);
-                        }
+                        listOfBags.Add((bagName, bagCount));
                     }
                 }
                 rules.Add(containerBag, listOfBags);
@@ -58,41 +55,41 @@ namespace aoc2020
                 {
                     if (!bagSet.Contains(keyValue.Key))
                     {
-                        foreach (string bag in keyValue.Value)
+                        foreach ((string name, int count) bag in keyValue.Value)
                         {
-                            if (bagSet.Contains(bag))
+                            if (bagSet.Contains(bag.name))
                             {
                                 bagSet.Add(keyValue.Key);
-                                addedCount++;
+                                addedCount += bag.count;
                             }
                         }
                     }
                 }
             }
 
-            Console.WriteLine("Day7 part1: {0}", bagSet.Count - 1);
+            Console.WriteLine($"Day7 part1: {bagSet.Count - 1}");
         }
 
-        private int CountBagsInBag(string bag, int bagCount)
+        private int CountBagsInBag((string name, int count) b)
         {
-            if (rules[bag].Count == 0)
-                return bagCount;
+            if (rules[b.name].Count == 0)
+                return b.count;
 
-            foreach(string subBag in rules[bag])
+            int bagsCount = 0;
+            foreach((string name, int count) subBag in rules[b.name])
             {
-                return 1;
+                bagsCount += CountBagsInBag(subBag);            
             }
-            return 0;
+            return bagsCount * b.count + b.count;
         }
+
         public void Part2()
         {
             string bagName = "shiny gold";
 
-            int count = CountBagsInBag(bagName, 1);
+            int count = CountBagsInBag(("shiny gold", 1));            
 
-            
-
-            Console.WriteLine("Day7 part2 {0}", count - 1);
+            Console.WriteLine($"Day7 part2 {count - 1}");
         }
 
     }
