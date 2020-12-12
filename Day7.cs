@@ -43,10 +43,9 @@ namespace aoc2020
 
         public void Part1()
         {
-            string bagName = "shiny gold";
             //go through all the bags
             HashSet<string> bagSet = new HashSet<string>();
-            bagSet.Add(bagName);
+            bagSet.Add("shiny gold");
             int addedCount = 1;
             while (addedCount != 0)
             {
@@ -85,10 +84,7 @@ namespace aoc2020
 
         public void Part2()
         {
-            string bagName = "shiny gold";
-
             int count = CountBagsInBag(("shiny gold", 1));            
-
             Console.WriteLine($"Day7 part2 {count - 1}");
         }
 
