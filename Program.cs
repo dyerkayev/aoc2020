@@ -39,9 +39,12 @@ namespace aoc2020
             //Day11 day11 = new Day11();
             //day11.Part1();
             //day11.Part2();
-            Day12 day12 = new Day12();
-            day12.Part1();
-            day12.Part2();
+            //Day12 day12 = new Day12();
+            //day12.Part1();
+            //day12.Part2();
+            Day13 day13 = new Day13();
+            day13.Part1();
+            day13.Part2();
         }
     }
 }
