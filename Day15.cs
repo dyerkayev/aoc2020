@@ -20,7 +20,7 @@ namespace aoc2020
                 turn++;
             }
         }
-        public void Part1()
+        public void Part1And2()
         {
             int count = 30000000;
             for (int i = numbers.Count + 1; i <= count; i++)
