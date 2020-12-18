@@ -54,7 +54,7 @@ namespace aoc2020
             //day17.Part1();
             //day17.Part2();
             Day18 day18 = new Day18();
-            //day18.Part1();
+            day18.Part1();
             day18.Part2();
 
         }

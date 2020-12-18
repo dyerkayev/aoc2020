@@ -32,38 +32,20 @@ namespace aoc2020
             while (start < expression.Length)
             {
                 char c = expression[start];
-                switch (c)
+
+                if (char.IsNumber(c))
+                    val = EvalOp(op, val, (int)char.GetNumericValue(c));
+                else if (c == '+' || c == '*')
+                    op = c;
+                else if (c == '(')
                 {
-                    case ' ':
-                        break;
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7':
-                    case '8':
-                    case '9':
-                        {
-                            int val1 = (int)char.GetNumericValue(c);
-                            val = EvalOp(op, val, val1);
-                        }
-                        break;
-                    case '*':
-                    case '+':
-                        op = c;
-                        break;
-                    case '(':
-                        {
-                            start++;
-                            BigInteger val1 = EvalExpr1(expression, ref start);
-                            val = EvalOp(op, val, val1);
-                        }
-                        break;
-                    case ')':
-                        return val;
+                    start++;
+                    BigInteger val1 = EvalExpr1(expression, ref start);
+                    val = EvalOp(op, val, val1);
                 }
+                else if (c == ')')
+                    return val;
+
                 start++;
             }
 
@@ -102,21 +84,11 @@ namespace aoc2020
             while (start < expression.Length)
             {
                 char c = expression[start];
-                if (c == ' ')
-                {
-                    start++;
-                    continue;
-                }
 
                 if (char.IsNumber(c))
-                {
-                    int val = (int)char.GetNumericValue(c);
-                    EvalOp2(op, val, expr);
-                }
+                    EvalOp2(op, (int)char.GetNumericValue(c), expr);
                 else if (c == '+' || c == '*')
-                {
                     op = c;
-                }
                 else if (c == '(')
                 {
                     start++;
@@ -124,9 +96,8 @@ namespace aoc2020
                     EvalOp2(op, val, expr);
                 }
                 else if (c == ')')
-                {
                     return EvalExpr3(expr);
-                }
+
                 start++;
             }
 
