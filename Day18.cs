@@ -22,7 +22,7 @@ namespace aoc2020
             else if (op == '+')
                 return val1 + val2;
             else
-                return val1;
+                return val2;
         }
 
         public BigInteger EvalExpr1(string expression, ref int start)
