@@ -21,20 +21,24 @@ namespace aoc2020
             }
             else
                 ruleIndices2 = null;
-            match1 = (char)0;
+            match = (char)0;
+            isRecursive = false;
+            limitLoops = false;
         }
         
         public Rule(char matchChar)
         {
-            match1 = matchChar;
+            match = matchChar;
             ruleIndices1 = null;
             ruleIndices2 = null;
+            isRecursive = false;
+            limitLoops = false;
         }
 
         public int IsMatch(char c)
         {
-            if (match1 != (char)0)
-                if (match1 == c)
+            if (match != (char)0)
+                if (match == c)
                     return 1;
                 else
                     return -1;
@@ -43,13 +47,16 @@ namespace aoc2020
         }
         public int[] ruleIndices1;
         public int[] ruleIndices2;
-        public char match1;
+        public char match;
+        public bool isRecursive;
+        public bool limitLoops;
     }
     class Day19
     {
         List<string> ruleLines;
         List<string> messages;
         Dictionary<int, Rule> rules;
+        int specialLoopLimit;
         public Day19()
         {
             string[] allLines = File.ReadAllLines("day19.txt");
@@ -92,55 +99,89 @@ namespace aoc2020
             }
         }
 
-        public bool CheckRules( int[] rules, char c, HashSet<int> failingRules)
+        public bool CheckRules( int[] rules, string str, ref int idx)
         {
             if (rules is null)
                 return false;
-
+            int index = idx;
             foreach (int r in rules)
             {
-                if (failingRules.Contains(r))
+                if (index > str.Length - 1)
                     return false;
 
-                if (!CheckMatch(r, c, failingRules))
-                {
-                    failingRules.Add(r);
+                if (!CheckMatch(r, str, ref index))
                     return false;
-                }
             }
-
+            
+            idx = index;
             return true;
         }
 
-        private bool CheckMatch(int ruleIndex, char c, HashSet<int> failingRules)
+        private bool CheckMatch(int ruleIndex, string str, ref int idx)
         {
-            if (failingRules.Contains(ruleIndex))
-                return false;
-
             Rule rule = rules[ruleIndex];
-            int match = rule.IsMatch(c);
+            int match = rule.IsMatch(str[idx]);
 
             if (match == 1)
+            {
+                idx++;
                 return true;
+            }
             else if (match == -1)
                 return false;
             else
-                return CheckRules(rule.ruleIndices1, c, failingRules)
-                    || CheckRules(rule.ruleIndices2, c, failingRules);
+            {                
+                return CheckRules(rule.ruleIndices1, str, ref idx)
+                    || CheckRules(rule.ruleIndices2, str, ref idx);
+            }
+        }
+
+        private bool CheckMatch2(int ruleIndex, string str, ref int idx)
+        {
+            Rule rule = rules[ruleIndex];
+            int match = rule.IsMatch(str[idx]);
+
+            if (match == 1)
+            {
+                idx++;
+                return true;
+            }
+            else if (match == -1)
+                return false;
+            else
+            {
+                if (rule.isRecursive)
+                {
+                    int index1 = idx;
+                    bool check1 = CheckRules(rule.ruleIndices1, str, ref index1);
+                    int index2 = idx;
+                    bool check2 = CheckRules(rule.ruleIndices2, str, ref index2);
+
+                    if (check1 && check2)
+                    {
+                        idx = Math.Max(index1, index2);
+                        return true;
+                    }
+
+                    return check1 || check2;
+                }
+                else
+                    return CheckRules(rule.ruleIndices1, str, ref idx)
+                        || CheckRules(rule.ruleIndices2, str, ref idx);
+            }
         }
 
         public void Part1()
         {
-            HashSet<int> rulesFailingA = new HashSet<int>();
-            HashSet<int> rulesFailingB = new HashSet<int>();
             int ruleIndex = 0;
             int numMatches = 0;
             foreach (string str in messages)
             {
                 bool fullMatch = true;
-                foreach(char c in str)
+                int i = 0;
+                while (i != str.Length)
                 {
-                    if (!CheckMatch(ruleIndex, c, c == 'a' ? rulesFailingA : rulesFailingB))
+                    if (!CheckMatch(ruleIndex, str, ref i))
                     {
                         fullMatch = false;
                         break;
@@ -155,6 +196,31 @@ namespace aoc2020
             }
 
             Console.WriteLine($"Day 19 Part1: {numMatches}");
+        }
+
+        public void Part2()
+        {
+            //replace rules
+            Rule rule8 = new Rule("42 | 42 8");
+            rule8.isRecursive = true;
+            rule8.limitLoops = true;
+            rules[8] = rule8;
+            
+            Rule rule11 = new Rule("42 31 | 42 11 31");
+            rules[11] = rule11;
+            rule11.isRecursive = true;
+
+            
+            //Rule rule101 = new Rule("42 42 31 | 42 42 11 31");
+            //Rule rule102 = new Rule("42 8 42 31 | 42 8 42 11 31");
+            //rules[101] = rule101;
+            //rules[102] = rule102;
+            //Rule rule0 = new Rule("101 | 102");
+            ////rule0.isRecursive = true;
+
+            //rules[0] = rule0;
+
+            Part1();
         }
     }
 }
