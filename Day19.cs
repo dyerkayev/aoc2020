@@ -56,13 +56,14 @@ namespace aoc2020
         List<string> ruleLines;
         List<string> messages;
         Dictionary<int, Rule> rules;
-        int specialLoopLimit;
+        int loopLimitPart2;
         public Day19()
         {
             string[] allLines = File.ReadAllLines("day19.txt");
             ruleLines = new List<string>();
             messages = new List<string>();
             rules = new Dictionary<int, Rule>();
+            loopLimitPart2 = 0;
             bool msgLines = false;
             foreach (string line in allLines)
             {
@@ -117,6 +118,24 @@ namespace aoc2020
             return true;
         }
 
+        public bool CheckRules2(int[] rules, string str, ref int idx)
+        {
+            if (rules is null)
+                return false;
+            int index = idx;
+            foreach (int r in rules)
+            {
+                if (index > str.Length - 1)
+                    return false;
+
+                if (!CheckMatch2(r, str, ref index))
+                    return false;
+            }
+
+            idx = index;
+            return true;
+        }
+
         private bool CheckMatch(int ruleIndex, string str, ref int idx)
         {
             Rule rule = rules[ruleIndex];
@@ -153,9 +172,15 @@ namespace aoc2020
                 if (rule.isRecursive)
                 {
                     int index1 = idx;
-                    bool check1 = CheckRules(rule.ruleIndices1, str, ref index1);
+                    bool check1 = CheckRules2(rule.ruleIndices1, str, ref index1);
+
                     int index2 = idx;
-                    bool check2 = CheckRules(rule.ruleIndices2, str, ref index2);
+                    bool check2 = true;
+                    if (rule.limitLoops && loopLimitPart2 > 0)
+                    {
+                        loopLimitPart2--;
+                        check2 = CheckRules2(rule.ruleIndices2, str, ref index2);
+                    }                
 
                     if (check1 && check2)
                     {
@@ -163,11 +188,16 @@ namespace aoc2020
                         return true;
                     }
 
+                    if (check1)
+                        idx = index1;
+                    else if (check2)
+                        idx = index2;
+
                     return check1 || check2;
                 }
                 else
-                    return CheckRules(rule.ruleIndices1, str, ref idx)
-                        || CheckRules(rule.ruleIndices2, str, ref idx);
+                    return CheckRules2(rule.ruleIndices1, str, ref idx)
+                        || CheckRules2(rule.ruleIndices2, str, ref idx);
             }
         }
 
@@ -177,18 +207,10 @@ namespace aoc2020
             int numMatches = 0;
             foreach (string str in messages)
             {
-                bool fullMatch = true;
-                int i = 0;
-                while (i != str.Length)
-                {
-                    if (!CheckMatch(ruleIndex, str, ref i))
-                    {
-                        fullMatch = false;
-                        break;
-                    }
-                }
+                int indexToCheck = 0;
+                bool fullMatch = CheckMatch(ruleIndex, str, ref indexToCheck);
 
-                if (fullMatch)
+                if (fullMatch && indexToCheck == str.Length)
                 {
                     Console.WriteLine($"Full match: {str}");
                     numMatches++;
@@ -210,7 +232,28 @@ namespace aoc2020
             rules[11] = rule11;
             rule11.isRecursive = true;
 
-            
+            int ruleIndex = 0;
+            int numMatches = 0;
+            foreach (string str in messages)
+            {
+                for (int loopLimit = 0; loopLimit < 128; loopLimit++)
+                {
+                    loopLimitPart2 = loopLimit;
+                    int indexToCheck = 0;
+                    bool fullMatch = CheckMatch2(ruleIndex, str, ref indexToCheck);
+
+                    if (fullMatch && indexToCheck == str.Length)
+                    {
+                        Console.WriteLine($"Full match: {str}");
+                        numMatches++;
+                        break;
+                    }
+                }
+            }
+
+            Console.WriteLine($"Day 19 Part2: {numMatches}");
+
+
             //Rule rule101 = new Rule("42 42 31 | 42 42 11 31");
             //Rule rule102 = new Rule("42 8 42 31 | 42 8 42 11 31");
             //rules[101] = rule101;
@@ -219,8 +262,6 @@ namespace aoc2020
             ////rule0.isRecursive = true;
 
             //rules[0] = rule0;
-
-            Part1();
         }
     }
 }
