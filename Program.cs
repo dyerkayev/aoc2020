@@ -56,9 +56,25 @@ namespace aoc2020
             //Day18 day18 = new Day18();
             //day18.Part1();
             //day18.Part2();
-            Day19 day19 = new Day19();
+            //Day19 day19 = new Day19();
             //day19.Part1();
-            day19.Part2();
+            //day19.Part2();
+            Day20 day20 = new Day20();
+            day20.Part1();
+            //day19.Part2();
+
+            
+            for (int h = 6; h < 23; h++)
+            {
+                Console.WriteLine($"{h}:00");
+                Console.Write($"{h}:00-");
+                for (int m = 15; m < 60; m+=15)
+                {
+                    Console.WriteLine($"{h}:{m}");
+                    Console.Write($"{h}:{m}-");
+                }
+            }
+
         }
     }
 }

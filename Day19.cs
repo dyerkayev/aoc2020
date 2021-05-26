@@ -244,7 +244,6 @@ namespace aoc2020
 
                     if (fullMatch && indexToCheck == str.Length)
                     {
-                        Console.WriteLine($"Full match: {str}");
                         numMatches++;
                         break;
                     }
@@ -252,16 +251,6 @@ namespace aoc2020
             }
 
             Console.WriteLine($"Day 19 Part2: {numMatches}");
-
-
-            //Rule rule101 = new Rule("42 42 31 | 42 42 11 31");
-            //Rule rule102 = new Rule("42 8 42 31 | 42 8 42 11 31");
-            //rules[101] = rule101;
-            //rules[102] = rule102;
-            //Rule rule0 = new Rule("101 | 102");
-            ////rule0.isRecursive = true;
-
-            //rules[0] = rule0;
         }
     }
 }
